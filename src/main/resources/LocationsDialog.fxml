@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="391.0" prefWidth="397.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.culpan.railops.controllers.LocationsDialogController">
+   <children>
+      <TreeView fx:id="treeLocations" layoutX="14.0" layoutY="14.0" onMouseClicked="#treeClicked" prefHeight="328.0" prefWidth="324.0" />
+      <ButtonBar layoutX="14.0" layoutY="346.0" prefHeight="40.0" prefWidth="363.0">
+        <buttons>
+          <Button defaultButton="true" mnemonicParsing="false" onAction="#closeClicked" text="Close" />
+        </buttons>
+      </ButtonBar>
+      <Button layoutX="351.0" layoutY="140.0" mnemonicParsing="false" onAction="#add" text="+" />
+      <Button layoutX="350.0" layoutY="178.0" mnemonicParsing="false" onAction="#remove" prefHeight="27.0" prefWidth="26.0" text="-" />
+   </children>
+</AnchorPane>

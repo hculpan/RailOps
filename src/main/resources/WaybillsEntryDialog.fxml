@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="429.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.culpan.railops.controllers.WaybillEntryDialogController">
+   <children>
+      <ButtonBar layoutX="412.0" layoutY="375.0" prefHeight="40.0" prefWidth="176.0">
+        <buttons>
+          <Button defaultButton="true" mnemonicParsing="false" onAction="#okClicked" text="Ok" />
+            <Button cancelButton="true" mnemonicParsing="false" onAction="#cancelClicked" text="Cancel" />
+        </buttons>
+      </ButtonBar>
+      <TabPane layoutX="14.0" layoutY="48.0" prefHeight="327.0" prefWidth="574.0" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab text="Waybill 1">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutX="14.0" layoutY="14.0" text="Consignee" />
+                        <TextField fx:id="textConsignee1" layoutX="14.0" layoutY="31.0" prefHeight="27.0" prefWidth="200.0" />
+                        <Label layoutX="14.0" layoutY="65.0" text="Destination" />
+                        <ChoiceBox fx:id="choiceDestination1" layoutX="14.0" layoutY="82.0" prefWidth="150.0" />
+                        <Label layoutX="14.0" layoutY="123.0" text="Routing" />
+                        <ChoiceBox fx:id="choiceRouting1" layoutX="14.0" layoutY="140.0" prefWidth="150.0" />
+                        <Label layoutX="287.0" layoutY="14.0" text="Shipper" />
+                        <TextField fx:id="textShipper1" layoutX="287.0" layoutY="31.0" prefHeight="27.0" prefWidth="200.0" />
+                        <Label layoutX="287.0" layoutY="65.0" text="Address" />
+                        <TextField fx:id="textShipperAddress1" layoutX="287.0" layoutY="82.0" prefHeight="27.0" prefWidth="200.0" />
+                        <Label layoutX="14.0" layoutY="181.0" text="Lading" />
+                        <TextField fx:id="textLading1" layoutX="14.0" layoutY="198.0" prefHeight="27.0" prefWidth="200.0" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab text="Waybill 2">
+               <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                       <children>
+                           <Label layoutX="14.0" layoutY="14.0" text="Consignee" />
+                           <TextField fx:id="textConsignee2" layoutX="14.0" layoutY="31.0" prefHeight="27.0" prefWidth="200.0" />
+                           <Label layoutX="14.0" layoutY="65.0" text="Destination" />
+                           <ChoiceBox fx:id="choiceDestination2" layoutX="14.0" layoutY="82.0" prefWidth="150.0" />
+                           <Label layoutX="14.0" layoutY="123.0" text="Routing" />
+                           <ChoiceBox fx:id="choiceRouting2" layoutX="14.0" layoutY="140.0" prefWidth="150.0" />
+                           <Label layoutX="287.0" layoutY="14.0" text="Shipper" />
+                           <TextField fx:id="textShipper2" layoutX="287.0" layoutY="31.0" prefHeight="27.0" prefWidth="200.0" />
+                           <Label layoutX="287.0" layoutY="65.0" text="Address" />
+                           <TextField fx:id="textShipperAddress2" layoutX="287.0" layoutY="82.0" prefHeight="27.0" prefWidth="200.0" />
+                           <Label layoutX="14.0" layoutY="181.0" text="Lading" />
+                           <TextField fx:id="textLading2" layoutX="14.0" layoutY="198.0" prefHeight="27.0" prefWidth="200.0" />
+                       </children>
+                    </AnchorPane>
+               </content>
+          </Tab>
+            <Tab text="Waybill 3">
+              <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                       <children>
+                           <Label layoutX="14.0" layoutY="14.0" text="Consignee" />
+                           <TextField fx:id="textConsignee3" layoutX="14.0" layoutY="31.0" prefHeight="27.0" prefWidth="200.0" />
+                           <Label layoutX="14.0" layoutY="65.0" text="Destination" />
+                           <ChoiceBox fx:id="choiceDestination3" layoutX="14.0" layoutY="82.0" prefWidth="150.0" />
+                           <Label layoutX="14.0" layoutY="123.0" text="Routing" />
+                           <ChoiceBox fx:id="choiceRouting3" layoutX="14.0" layoutY="140.0" prefWidth="150.0" />
+                           <Label layoutX="287.0" layoutY="14.0" text="Shipper" />
+                           <TextField fx:id="textShipper3" layoutX="287.0" layoutY="31.0" prefHeight="27.0" prefWidth="200.0" />
+                           <Label layoutX="287.0" layoutY="65.0" text="Address" />
+                           <TextField fx:id="textShipperAddress3" layoutX="287.0" layoutY="82.0" prefHeight="27.0" prefWidth="200.0" />
+                           <Label layoutX="14.0" layoutY="181.0" text="Lading" />
+                           <TextField fx:id="textLading3" layoutX="14.0" layoutY="198.0" prefHeight="27.0" prefWidth="200.0" />
+                       </children>
+                    </AnchorPane>
+              </content>
+            </Tab>
+            <Tab text="Waybill 4">
+              <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                       <children>
+                           <Label layoutX="14.0" layoutY="14.0" text="Consignee" />
+                           <TextField fx:id="textConsignee4" layoutX="14.0" layoutY="31.0" prefHeight="27.0" prefWidth="200.0" />
+                           <Label layoutX="14.0" layoutY="65.0" text="Destination" />
+                           <ChoiceBox fx:id="choiceDestination4" layoutX="14.0" layoutY="82.0" prefWidth="150.0" />
+                           <Label layoutX="14.0" layoutY="123.0" text="Routing" />
+                           <ChoiceBox fx:id="choiceRouting4" layoutX="14.0" layoutY="140.0" prefWidth="150.0" />
+                           <Label layoutX="287.0" layoutY="14.0" text="Shipper" />
+                           <TextField fx:id="textShipper4" layoutX="287.0" layoutY="31.0" prefHeight="27.0" prefWidth="200.0" />
+                           <Label layoutX="287.0" layoutY="65.0" text="Address" />
+                           <TextField fx:id="textShipperAddress4" layoutX="287.0" layoutY="82.0" prefHeight="27.0" prefWidth="200.0" />
+                           <Label layoutX="14.0" layoutY="181.0" text="Lading" />
+                           <TextField fx:id="textLading4" layoutX="14.0" layoutY="198.0" prefHeight="27.0" prefWidth="200.0" />
+                       </children>
+                    </AnchorPane>
+              </content>
+            </Tab>
+        </tabs>
+      </TabPane>
+      <Label layoutX="14.0" layoutY="14.0" text="R.R./No.:">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+      <TextField fx:id="textCarId" editable="false" layoutX="71.0" layoutY="10.0" prefHeight="27.0" prefWidth="198.0" />
+      <Label layoutX="356.0" layoutY="14.0" text="AAR:">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+      <TextField fx:id="textAarCode" editable="false" layoutX="388.0" layoutY="10.0" prefHeight="27.0" prefWidth="198.0" />
+      <Button layoutX="15.0" layoutY="382.0" mnemonicParsing="false" onAction="#clearAllClicked" text="Clear All" />
+   </children>
+</AnchorPane>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="425.0" prefWidth="224.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.culpan.railops.controllers.RouteEditDialogController">
+   <children>
+      <TextField fx:id="textName" layoutX="14.0" layoutY="34.0" />
+      <Label layoutX="14.0" layoutY="14.0" text="Route name" />
+      <ListView fx:id="listStops" layoutX="14.0" layoutY="137.0" prefHeight="200.0" prefWidth="161.0" />
+      <Label layoutX="14.0" layoutY="120.0" text="Stops" />
+      <Button layoutX="14.0" layoutY="349.0" mnemonicParsing="false" onAction="#addStop" text="+" />
+      <Button layoutX="183.0" layoutY="310.0" mnemonicParsing="false" onAction="#deleteStop" prefWidth="26.0" text="-" />
+      <Button defaultButton="true" layoutX="105.0" layoutY="388.0" mnemonicParsing="false" onAction="#okClicked" text="Ok" />
+      <Button cancelButton="true" layoutX="152.0" layoutY="388.0" mnemonicParsing="false" onAction="#cancelClicked" text="Cancel" />
+      <Button layoutX="184.0" layoutY="190.0" mnemonicParsing="false" onAction="#stopUp" prefWidth="26.0" text="^" />
+      <Button layoutX="184.0" layoutY="237.0" mnemonicParsing="false" onAction="#stopDown" prefHeight="27.0" prefWidth="26.0" text="v">
+         <font>
+            <Font size="9.0" />
+         </font>
+      </Button>
+      <ChoiceBox fx:id="choiceDestination" layoutX="47.0" layoutY="349.0" prefHeight="27.0" prefWidth="161.0" />
+      <Label layoutX="14.0" layoutY="67.0" text="Railroad" />
+      <ChoiceBox fx:id="choiceRailroad" layoutX="14.0" layoutY="84.0" prefWidth="150.0" />
+   </children>
+</AnchorPane>
