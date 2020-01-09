@@ -8,7 +8,6 @@ import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import org.culpan.railops.dao.Datastore;
 import org.culpan.railops.dao.LocationsDao;
 import org.culpan.railops.dao.WaybillDao;
 import org.culpan.railops.model.Location;

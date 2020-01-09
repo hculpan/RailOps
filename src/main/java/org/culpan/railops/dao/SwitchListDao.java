@@ -8,7 +8,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SwitchListDao extends BaseDao<SwitchList> {
+public class  SwitchListDao extends BaseDao<SwitchList> {
+    private final static CarsDao carsDao = new CarsDao();
+
     @Override
     public boolean exists(SwitchList item) {
         if (item != null && item.getId() > 0) {
@@ -35,7 +37,7 @@ public class SwitchListDao extends BaseDao<SwitchList> {
         deleteMoves(item);
         for (Move m : item.getMoves()) {
             executeUpdate("insert into moves (car_id, move, location_id, switch_list_id, lading) " +
-                    "values('" + m.getCarId() +
+                    "values('" + m.getCar().getId() +
                     "', '" + m.getMove() +
                     "', " + m.getLocationId() +
                     " , " + item.getId() +
@@ -46,19 +48,22 @@ public class SwitchListDao extends BaseDao<SwitchList> {
     }
 
     @Override
-    public void addOrUpdate(SwitchList item) {
+    public boolean addOrUpdate(SwitchList item, boolean autocommit) {
         if (exists(item)) {
             updateMoves(item);
-            executeUpdate("update switch_lists " +
+            return executeUpdate("update switch_lists " +
                     "set route_id = " + item.getRouteId() +
                     ", status = '" + item.getStatus() +
                     "' where id = " + item.getId());
         } else {
-            executeUpdate("insert into switch_lists (route_id, status) " +
-                    "values(" + item.getRouteId() + ",'" + item.getStatus() + "')");
-            int id = getLastInsertId();
-            item.setId(id);
-            updateMoves(item);
+            if (executeUpdate("insert into switch_lists (route_id, status) " +
+                    "values(" + item.getRouteId() + ",'" + item.getStatus() + "')")) {
+                item.setId(getLastInsertId());
+                updateMoves(item);
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
@@ -72,6 +77,11 @@ public class SwitchListDao extends BaseDao<SwitchList> {
     public void delete(SwitchList item) {
         deleteMoves(item);
         executeUpdate("delete from switch_lists where id = " + item.getId());
+    }
+
+    @Override
+    public SwitchList findById(int id) {
+        return null;
     }
 
     @Override
@@ -102,7 +112,7 @@ public class SwitchListDao extends BaseDao<SwitchList> {
     protected Move moveFromResultSetRow(ResultSet rs) throws SQLException {
         Move m = new Move();
         m.setId(rs.getInt("id"));
-        m.setCarId(rs.getString("car_id"));
+        m.setCar(carsDao.findById(rs.getInt("car_id")));
         m.setLocationId(rs.getInt("location_id"));
         m.setMove(rs.getString("move"));
         m.setLading(rs.getString("lading"));

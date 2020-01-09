@@ -12,11 +12,9 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import org.culpan.railops.dao.Datastore;
 import org.culpan.railops.dao.LocationsDao;
 import org.culpan.railops.dao.RoutesDao;
 import org.culpan.railops.model.Location;
-import org.culpan.railops.model.Railroad;
 import org.culpan.railops.model.Route;
 
 import java.sql.SQLException;

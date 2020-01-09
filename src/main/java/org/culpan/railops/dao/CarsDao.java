@@ -17,58 +17,52 @@ public class CarsDao extends BaseDao<Car> {
         setCarLocation(carId, locationName, -1);
     }
 
-    public void setCarLocation(String carId, String locationName, int waybillSequence) {
+    public void setCarLocation(String carRoadId, String locationName, int waybillSequence) {
         LocationsDao locationsDao = new LocationsDao();
         Location location = locationsDao.find(locationName);
         executeUpdate("update cars " +
                 "set location_id = " + location.getId() +
                 ", waybill_sequence = " + waybillSequence +
-                " where id = '" + carId + "'");
+                " where road_id = '" + carRoadId + "'");
     }
 
     @Override
     public void delete(Car c) {
-        try {
-            Waybill waybill = waybillDao.findWaybill(c.getId());
-            if (waybill != null) {
-                Datastore.instance.delete(waybill);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        Waybill waybill = waybillDao.findWaybill(c.getRoadId());
+        if (waybill != null) {
+            waybillDao.delete(waybill);
         }
 
-        executeUpdate("delete from cars " +
-                "where mark = '" + c.getMark() +
-                "' and id = '" + c.getId() + "'");
+        executeUpdate("delete from cars where id = " + c.getId());
     }
 
     @Override
-    public Car find(Car item) {
-        return find(item.getId());
+    public Car findById(int id) {
+        return executeItemQuery("select * from cars where id = " + id,
+                rs -> {
+                    if (rs.next()) return itemFromResultSetRow(rs);
+                    return null;
+                });
     }
 
     @Override
     protected Car itemFromResultSetRow(ResultSet rs) throws SQLException {
-        Car r = new Car(
-                rs.getString("kind"),
-                rs.getString("mark"),
-                rs.getString("id"),
-                rs.getString("aarCode"),
-                rs.getString("description"),
-                Datastore.instance.findLocationName(rs.getInt("location_id")));
+        Car r = new Car();
+        r.setId(rs.getInt("id"));
+        r.setKind(rs.getString("kind"));
+        r.setRoadId(rs.getString("road_id"));
+        r.setAarCode(rs.getString("aarCode"));
+        r.setDescription(rs.getString("description"));
+        r.setLocationId(rs.getInt("location_id"));
         r.setSwitching(rs.getInt("switching") > 0);
         r.setWaybillSequence(rs.getInt("waybill_sequence"));
-        Location l = locationsDao.find(rs.getInt("location_id"));
-        if (l != null) {
-            r.setLocation(l.getName());
-        }
-        r.setWaybill(Datastore.instance.carWaybillExists(r.getId()));
+        r.setWaybillId(rs.getInt("waybill_id"));
         return r;
     }
 
     @Override
     public List<Car> load() {
-        return executeListQuery("select * from cars order by mark, id", rs -> {
+        return executeListQuery("select * from cars", rs -> {
             List<Car> result = new ArrayList<>();
 
             while (rs.next()) {
@@ -78,74 +72,73 @@ public class CarsDao extends BaseDao<Car> {
             return result;
         });
     }
-    
+
     @Override
     public boolean exists(Car c) {
-        boolean result = false;
-
-        if (c != null && c.getId() != null && !c.getId().isEmpty()) {
-            String sql = "select count(*) as cnt from cars " +
-                    "where mark = '" + c.getMark() + "' and id = '" + c.getId() + "'";
-            Object o = executeItemQuery(sql, rs -> {
-                if (rs.next()) {
-                    return (rs.getInt("cnt") > 0);
-                }
-                return false;
-            });
-            result = ((Boolean)o).booleanValue();
-        }
-
-        return result;
+        return findById(c.getId()) != null;
     }
 
     @Override
-    public void addOrUpdate(Car c) {
+    public boolean addOrUpdate(Car c, boolean autocommit) {
         if (exists(c)) {
-            Integer locationId = null;
-            if (c.getLocation() != null && !c.getLocation().isEmpty()) {
-                LocationsDao locationsDao = new LocationsDao();
-                Location l = locationsDao.find(c.getLocation());
-                locationId = (l != null ? l.getId() : null);
-            }
-
-            executeUpdate("update cars " +
-                    "set kind = '" + c.getKind() +
-                    "', aarCode = '" + c.getAarCode() +
-                    "', description = '" + c.getDescription() +
-                    "', location_id = " + (locationId != null ? locationId.intValue() : null)  +
-                    " , waybill_sequence = " + c.getWaybillSequence() +
-                    " , switching = " + c.getSwitchingValue() + " " +
-                    "where mark = '" + c.getMark() +
-                    "' and id = '" + c.getId() + "'");
+            return executeUpdate(String.format("update cars " +
+                    "set kind = '%s', " +
+                    "    road_id = '%s', " +
+                    "    aarCode = '%s', " +
+                    "    description = '%s', " +
+                    "    location_id = %d, " +
+                    "    waybill_sequence = %d, " +
+                    "    waybill_id = %d, " +
+                    "    switching = %d " +
+                    "where id = %d",
+                    c.getKind(),
+                    c.getRoadId(),
+                    c.getAarCode(),
+                    c.getDescription(),
+                    c.getLocationId(),
+                    c.getWaybillSequence(),
+                    c.getWaybillId(),
+                    (c.isSwitching() ? 1 : 0)), autocommit);
         } else {
-            executeUpdate("insert into cars (kind, mark, id, aarCode, description, waybill_sequence, switching) " +
-                    "values ('" + c.getKind() + "','" + c.getMark() + "','" +
-                    c.getId() + "','" + c.getAarCode() + "','" + c.getDescription() + "', -1, " +
-                    c.getSwitchingValue() + ")");
+            if (executeUpdate(String.format("insert into cars " +
+                    "(kind, road_id, aarCode, description, location_id, waybill_sequence, waybill_id, switching) " +
+                    "values ('%s','%s','%s','%s',%d,%d,%d,%d)",
+                    c.getKind(),
+                    c.getRoadId(),
+                    c.getAarCode(),
+                    c.getDescription(),
+                    c.getLocationId(),
+                    c.getWaybillSequence(),
+                    c.getWaybillId(),
+                    (c.isSwitching() ? 1 : 0), autocommit))) {
+                c.setId(getLastInsertId());
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
-    public Car find(String id) {
-        Object o = executeItemQuery("select * from cars " +
-                "where id = '" + id + "'", rs -> {
+    public Car findByRoadId(String id) {
+        return executeItemQuery("select * from cars " +
+                "where road_id = '" + id + "'", rs -> {
             if ( rs.next() ) {
                 return itemFromResultSetRow(rs);
             }
             return null;
         });
-        return (Car)o;
     }
 
-    public void moveCarTo(String carId, int locationId, boolean nextWaybill) {
-        Car c = find(carId);
+    public void moveCarTo(String carRoadId, int locationId, boolean nextWaybill) {
+        Car c = findByRoadId(carRoadId);
         if (c != null) {
             c.setSwitching(false);
-            c.setLocation(locationsDao.find(locationId).getName());
+            c.setLocationId(locationId);
 
             if (nextWaybill) {
                 int newWaybillSequence = c.getWaybillSequence();
 
-                Waybill waybill = waybillDao.findWaybill(carId);
+                Waybill waybill = waybillDao.findWaybill(carRoadId);
                 if (newWaybillSequence == waybill.getStops().size() - 1) {
                     newWaybillSequence = 0;
                 } else {
@@ -157,9 +150,9 @@ public class CarsDao extends BaseDao<Car> {
         }
     }
 
-    public void updateSwitching(String id, boolean value) {
-        executeUpdate("update cars set switching = " + (value ? 1 : 0) +
-                " where id = '" + id + "'");
+    public boolean updateSwitching(String roadId, boolean value) {
+        return executeUpdate("update cars set switching = " + (value ? 1 : 0) +
+                " where road_id = '" + roadId + "'");
     }
 
     public List<Car> carsAtLocation(Location l) {

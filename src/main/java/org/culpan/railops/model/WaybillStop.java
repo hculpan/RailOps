@@ -1,13 +1,14 @@
 package org.culpan.railops.model;
 
-public class WaybillStop {
+public class WaybillStop extends BaseModel {
     private int sequence;
     private String consignee;
-    private Location location;
+    private int locationId;
     private String routing;
     private String shipper;
     private String shipper_address;
     private String lading;
+    private int waybillId;
 
     public int getSequence() {
         return sequence;
@@ -25,16 +26,12 @@ public class WaybillStop {
         this.consignee = consignee;
     }
 
-    public Location getLocation() {
-        return location;
+    public int getLocationId() {
+        return locationId;
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
-    }
-
-    public String getDestination() {
-        return (location != null ? location.getName() : null);
+    public void setLocationId(int locationId) {
+        this.locationId = locationId;
     }
 
     public String getRouting() {
@@ -67,5 +64,13 @@ public class WaybillStop {
 
     public void setLading(String lading) {
         this.lading = lading;
+    }
+
+    public int getWaybillId() {
+        return waybillId;
+    }
+
+    public void setWaybillId(int waybillId) {
+        this.waybillId = waybillId;
     }
 }

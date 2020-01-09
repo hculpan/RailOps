@@ -3,20 +3,11 @@ package org.culpan.railops.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SwitchList {
-    private int id;
+public class SwitchList extends BaseModel {
     private int routeId;
     private String status;
 
     private final List<Move> moves = new ArrayList<>();
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public int getRouteId() {
         return routeId;

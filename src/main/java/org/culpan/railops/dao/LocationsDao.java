@@ -5,6 +5,7 @@ import org.culpan.railops.model.Location;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class LocationsDao extends BaseDao<Location> {
@@ -28,10 +29,6 @@ public class LocationsDao extends BaseDao<Location> {
             return null;
         });
         return (Location)o;
-    }
-
-    public boolean exists(String location) {
-        return find(location) != null;
     }
 
     @Override
@@ -67,15 +64,21 @@ public class LocationsDao extends BaseDao<Location> {
     }
 
     @Override
-    public void addOrUpdate(Location item) {
+    public boolean addOrUpdate(Location item, boolean autocommit) {
         if (exists(item)) {
-            executeUpdate("update locations " +
+            return executeUpdate("update locations " +
                     "set name = '" + item.getName() +
                     "', staging = " + item.isStaging() +
-                    "where id = " + item.getId());
+                    "where id = " + item.getId(), autocommit);
         } else {
-            executeUpdate("insert into locations (name, staging) " +
-                    "values ('" + item.getName() + "'," + (item.isStaging() ? 1 : 0) + ")");
+            if (executeUpdate("insert into locations (name, staging) " +
+                    "values ('" + item.getName() + "'," + (item.isStaging() ? 1 : 0) + ")", autocommit)) {
+                item.setId(getLastInsertId());
+                item.setId(getLastInsertId());
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
@@ -96,6 +99,11 @@ public class LocationsDao extends BaseDao<Location> {
     }
 
     @Override
+    public Location findById(int id) {
+        return null;
+    }
+
+    @Override
     public Location find(Location item) {
         return find(item.getId());
     }
@@ -104,9 +112,25 @@ public class LocationsDao extends BaseDao<Location> {
     protected Location itemFromResultSetRow(ResultSet rs) throws SQLException {
         Location result = new Location(rs.getInt("id"), rs.getString("name"));
         result.setStaging(rs.getInt("staging") > 0);
-        result.getCarsTypes().addAll(loadLocationCars(result.getName()));
-        result.getRailroads().addAll(loadLocationRailroads(result.getName()));
+        result.getCarsTypes().addAll(loadLocationCarTypes(result));
+        result.getRailroadIds().addAll(loadLocationRailroadIds(result));
         return result;
+    }
+
+    private Collection<? extends Integer> loadLocationRailroadIds(Location location) {
+        List<Integer> result = new ArrayList<>();
+        executeQuery("select railroad_id from location_railroads_xref " +
+                "where location_id = " + location.getId(),
+                rs -> {
+                    while (rs.next()) result.add(rs.getInt("location_id"));
+                    return null;
+                });
+        return result;
+    }
+
+    private Collection<? extends String> loadLocationCarTypes(Location location) {
+        // TODO Implement
+        return null;
     }
 
     public List<Location> allLocationsForRailroad(String railroadMark) {

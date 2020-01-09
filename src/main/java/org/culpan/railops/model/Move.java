@@ -1,32 +1,13 @@
 package org.culpan.railops.model;
 
-import javafx.beans.property.SimpleStringProperty;
-
-public class Move {
-    public enum MoveType { mtPickUp, mtSetOut, mtPickupLocomotive, mtDropoffLocmotive };
-
-    private int id;
+public class Move extends BaseModel {
+    public enum ActionType { atPickUp, atSetOut, atPickupLocomotive, atDropoffLocmotive };
 
     private int switchListId;
-
     private int locationId;
-
-    private final SimpleStringProperty routeName = new SimpleStringProperty();
-    private final SimpleStringProperty carId = new SimpleStringProperty();
-    private final SimpleStringProperty move = new SimpleStringProperty();
-    private final SimpleStringProperty lading = new SimpleStringProperty();
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getRouteName() {
-        return routeName.get();
-    }
+    private Car car;
+    private String action;
+    private String lading;
 
     public int getSwitchListId() {
         return switchListId;
@@ -44,71 +25,51 @@ public class Move {
         this.locationId = locationId;
     }
 
-    public SimpleStringProperty routeNameProperty() {
-        return routeName;
+    public Car getCar() {
+        return car;
     }
 
-    public void setRouteName(String routeName) {
-        this.routeName.set(routeName);
+    public void setCar(Car car) {
+        this.car = car;
     }
 
-    public String getCarId() {
-        return carId.get();
+    public String getAction() {
+        return action;
     }
 
-    public SimpleStringProperty carIdProperty() {
-        return carId;
-    }
-
-    public void setCarId(String carId) {
-        this.carId.set(carId);
-    }
-
-    public String getMove() {
-        return move.get();
-    }
-
-    public MoveType getMoveType() {
-        if (getMove().equalsIgnoreCase("pick up")) {
-            return MoveType.mtPickUp;
-        } else if (getMove().equalsIgnoreCase("set out")) {
-            return MoveType.mtSetOut;
-        } else if (getMove().equalsIgnoreCase("start")) {
-            return MoveType.mtPickupLocomotive;
-        } else {
-            return MoveType.mtDropoffLocmotive;
-        }
-    }
-
-    public SimpleStringProperty moveProperty() {
-        return move;
-    }
-
-    public void setMove(String move) {
-        this.move.set(move);
-    }
-
-    public void setMove(MoveType type) {
-        if (type == MoveType.mtPickUp) {
-            setMove("Pick up");
-        } else if (type == MoveType.mtSetOut) {
-            setMove("Set out");
-        } else if (type == MoveType.mtPickupLocomotive) {
-            setMove("Start");
-        } else {
-            setMove("End");
-        }
+    public void setAction(String action) {
+        this.action = action;
     }
 
     public String getLading() {
-        return lading.get();
-    }
-
-    public SimpleStringProperty ladingProperty() {
         return lading;
     }
 
     public void setLading(String lading) {
-        this.lading.set(lading);
+        this.lading = lading;
+    }
+
+    public ActionType getActionType() {
+        if (getAction().equalsIgnoreCase("pick up")) {
+            return ActionType.atPickUp;
+        } else if (getAction().equalsIgnoreCase("set out")) {
+            return ActionType.atSetOut;
+        } else if (getAction().equalsIgnoreCase("start")) {
+            return ActionType.atPickupLocomotive;
+        } else {
+            return ActionType.atDropoffLocmotive;
+        }
+    }
+
+    public void setAction(ActionType type) {
+        if (type == ActionType.atPickUp) {
+            setAction("Pick up");
+        } else if (type == ActionType.atSetOut) {
+            setAction("Set out");
+        } else if (type == ActionType.atPickupLocomotive) {
+            setAction("Start");
+        } else {
+            setAction("End");
+        }
     }
 }

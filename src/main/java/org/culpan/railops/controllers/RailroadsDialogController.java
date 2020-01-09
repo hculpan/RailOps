@@ -10,7 +10,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-import org.culpan.railops.dao.Datastore;
 import org.culpan.railops.model.Railroad;
 
 import java.net.URL;

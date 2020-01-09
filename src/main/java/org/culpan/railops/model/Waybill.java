@@ -3,19 +3,19 @@ package org.culpan.railops.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Waybill {
+public class Waybill extends BaseModel {
     private final List<WaybillStop> stops = new ArrayList<>();
-    private String carId;
+    private int carId;
 
     public List<WaybillStop> getStops() {
         return stops;
     }
 
-    public String getCarId() {
+    public int getCarId() {
         return carId;
     }
 
-    public void setCarId(String carId) {
+    public void setCarId(int carId) {
         this.carId = carId;
     }
 }

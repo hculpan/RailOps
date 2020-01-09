@@ -16,7 +16,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.culpan.railops.dao.CarsDao;
-import org.culpan.railops.dao.Datastore;
 import org.culpan.railops.dao.LocationsDao;
 import org.culpan.railops.dao.WaybillDao;
 import org.culpan.railops.model.Car;

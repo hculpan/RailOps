@@ -6,7 +6,6 @@ import org.culpan.railops.model.WaybillStop;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 
 public class WaybillDao extends BaseDao<Waybill> {
@@ -35,6 +34,11 @@ public class WaybillDao extends BaseDao<Waybill> {
     }
 
     @Override
+    public boolean addOrUpdate(Waybill item, boolean autocommit) {
+        return false;
+    }
+
+    @Override
     public void addOrUpdate(Waybill item) {
 
     }
@@ -45,13 +49,18 @@ public class WaybillDao extends BaseDao<Waybill> {
     }
 
     @Override
+    public Waybill findById(int id) {
+        return null;
+    }
+
+    @Override
     public Waybill find(Waybill item) {
         return findWaybill(item.getCarId());
     }
 
     @Override
     protected Waybill itemFromResultSetRow(ResultSet rs) throws SQLException {
-        return null;
+        Waybill result = new Waybill();
     }
 
     public Waybill findWaybill(String carId) {

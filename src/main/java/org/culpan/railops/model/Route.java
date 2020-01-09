@@ -1,58 +1,38 @@
 package org.culpan.railops.model;
 
-import javafx.beans.property.SimpleStringProperty;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class Route {
-    private int id;
+public class Route extends BaseModel {
+    private String name;
+    private int railroadId;
 
-    private final SimpleStringProperty name = new SimpleStringProperty();
-    private final SimpleStringProperty railroad = new SimpleStringProperty();
-
-    private final List<Location> stops = new ArrayList<>();
+    private final List<Integer> stops = new ArrayList<>();
 
     private int switchListId;
 
-    public Route(String name, String railroad) {
+    public Route(String name, int railroad) {
         setName(name);
-        setRailroad(railroad);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+        setRailroadId(railroad);
     }
 
     public String getName() {
-        return name.get();
-    }
-
-    public SimpleStringProperty nameProperty() {
         return name;
     }
 
     public void setName(String name) {
-        this.name.set(name);
+        this.name = name;
     }
 
-    public String getRailroad() {
-        return railroad.get();
+    public int getRailroadId() {
+        return railroadId;
     }
 
-    public SimpleStringProperty railroadProperty() {
-        return railroad;
+    public void setRailroadId(int railroadId) {
+        this.railroadId = railroadId;
     }
 
-    public void setRailroad(String railroad) {
-        this.railroad.set(railroad);
-    }
-
-    public List<Location> getStops() {
+    public List<Integer> getStops() {
         return stops;
     }
 
