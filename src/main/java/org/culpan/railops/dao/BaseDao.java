@@ -3,6 +3,7 @@ package org.culpan.railops.dao;
 import org.culpan.railops.dao.annotations.Column;
 import org.culpan.railops.dao.annotations.OneToMany;
 import org.culpan.railops.dao.annotations.OneToOne;
+import org.culpan.railops.dao.interfaces.PostAddOrUpdate;
 import org.culpan.railops.dao.interfaces.PostInitialize;
 import org.culpan.railops.model.BaseModel;
 import org.culpan.railops.util.AppHelper;
@@ -107,6 +108,7 @@ public abstract class BaseDao<T extends BaseModel> {
     }
 
     protected boolean addOrUpdateRelated(T item, boolean autocommit) {
+        boolean result = true;
         try {
             Class<? extends BaseModel> c = item.getClass();
             for (Field field : c.getDeclaredFields()) {
@@ -123,14 +125,14 @@ public abstract class BaseDao<T extends BaseModel> {
                             throw new RuntimeException("Attempt to assign foreign id to a non-numeric field");
                         }
                         foreignKeyField.set(data, item.getId());
-                        return dao.addOrUpdate(data, autocommit);
+                        result = dao.addOrUpdate(data, autocommit);
                     }
                 } else if (field.isAnnotationPresent(OneToMany.class)) {
                     OneToMany a = field.getAnnotation(OneToMany.class);
                     if (a.persist() && Collection.class.isAssignableFrom(field.getType())) {
                         Class<? extends BaseDao> daoClass = a.dao();
                         BaseDao dao = daoClass.getDeclaredConstructor().newInstance();
-                        Collection<? extends BaseModel> data = (Collection<? extends BaseModel>)field.get(item);
+                        Collection<? extends BaseModel> data = (Collection<? extends BaseModel>) field.get(item);
                         for (BaseModel b : data) {
                             Field foreignKeyField = b.getClass().getDeclaredField(a.keyFieldName());
                             foreignKeyField.setAccessible(true);
@@ -139,19 +141,20 @@ public abstract class BaseDao<T extends BaseModel> {
                             }
                             foreignKeyField.set(b, item.getId());
                             if (!dao.addOrUpdate(b, autocommit)) {
-                                return false;
+                                result = false;
                             }
                         }
                     }
-                    return true;
                 }
             }
         } catch (Throwable t) {
             AppHelper.showExceptionInfo(t, t.getLocalizedMessage());
-            return false;
+            result = false;
         }
 
-        return true;
+        if (result && this instanceof PostAddOrUpdate) ((PostAddOrUpdate) this).addOrUpdateComplete(item, autocommit);
+
+        return result;
     }
 
     public boolean addOrUpdate(T item) {

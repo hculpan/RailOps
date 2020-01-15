@@ -7,19 +7,18 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import org.culpan.railops.dao.BaseDao;
 import org.culpan.railops.dao.LocationsDao;
 import org.culpan.railops.dao.RailroadsDao;
 import org.culpan.railops.dao.RoutesDao;
+import org.culpan.railops.model.Location;
 import org.culpan.railops.model.Railroad;
 import org.culpan.railops.model.Route;
-import org.culpan.railops.util.AppHelper;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,14 +52,17 @@ public class RouteEditDialogController {
         choiceRailroad.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number number2) {
-/*                String choice = choiceRailroad.getItems().get((Integer) number2);
-                List<Location> locations = locationsDao.allLocationsForRailroad(choice);
+                String choice = choiceRailroad.getItems().get((Integer) number2);
+                Railroad r = railroadsDao.findByMark(choice);
+                if (r == null) return;
+
+                List<Location> locations = locationsDao.loadAllForRailroad(r);
                 if (locations != null) {
                     choiceDestination.getItems().clear();
                     for (Location l : locations) {
                         choiceDestination.getItems().add(l.getName());
                     }
-                }*/
+                }
             }
         });
 
@@ -113,13 +115,16 @@ public class RouteEditDialogController {
         if (choiceRailroad.getValue() == null || choiceRailroad.getValue().isEmpty()) return;
 
         if (route == null) {
-//            route = new Route(textName.getText(), choiceRailroad.getValue());
+            route = new Route(); //textName.getText(), choiceRailroad.getValue());
+            route.setName(textName.getText());
+            route.setRailroad(railroadsDao.findByMark(choiceRailroad.getValue()));
         }
 
-//        route.getStops().clear();
+        route.getLocations().clear();
         for (String s : stops) {
-/*            Location l = locationsDao.find(s);
-            if (!locationsDao.doesRailroadServeLocation(choiceRailroad.getValue(), l)) {
+            Location l = locationsDao.findByName(s);
+            List<Railroad> railroads = railroadsDao.loadRailroadsByLocation(l);
+            if (railroads.stream().filter(r -> r.getMark().equalsIgnoreCase(choiceRailroad.getValue())).count() == 0) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Invalid Stop");
                 alert.setHeaderText("You have selected an invalid stop");
@@ -127,7 +132,7 @@ public class RouteEditDialogController {
                 alert.showAndWait();
                 return;
             }
-            route.getStops().add(l);*/
+            route.getLocations().add(l);
         }
 
         routesDao.addOrUpdate(route);

@@ -1,7 +1,15 @@
 package org.culpan.railops.model;
 
+import org.culpan.railops.dao.RailroadsDao;
+import org.culpan.railops.dao.SwitchListDao;
 import org.culpan.railops.dao.annotations.Column;
+import org.culpan.railops.dao.annotations.OneToOne;
+import org.culpan.railops.dao.annotations.Table;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@Table(name = "routes")
 public class Route extends BaseModel {
     @Column
     private String name;
@@ -9,12 +17,16 @@ public class Route extends BaseModel {
     @Column(name = "railroad_id")
     private int railroadId;
 
+    @OneToOne(fieldName = "railroadId", dao = RailroadsDao.class)
     private Railroad railroad;
 
     @Column(name = "switch_list_id")
     private int switchListId;
 
+    @OneToOne(fieldName = "switchListId", dao = SwitchListDao.class)
     private SwitchList switchList;
+
+    private final List<Location> locations = new ArrayList<>();
 
     public Route() {
     }
@@ -41,6 +53,8 @@ public class Route extends BaseModel {
 
     public void setRailroad(Railroad railroad) {
         this.railroad = railroad;
+        if (railroad != null) this.railroadId = railroad.getId();
+        else this.railroadId = 0;
     }
 
     public int getSwitchListId() {
@@ -57,5 +71,11 @@ public class Route extends BaseModel {
 
     public void setSwitchList(SwitchList switchList) {
         this.switchList = switchList;
+        if (switchList != null) setSwitchListId(switchList.getId());
+        else setSwitchListId(0);
+    }
+
+    public List<Location> getLocations() {
+        return locations;
     }
 }

@@ -133,29 +133,29 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-/*        treeRoutes.setShowRoot(false);
+        treeRoutes.setShowRoot(false);
         TreeItem<String> root = new TreeItem<>();
         root.setExpanded(true);
 
         List<Route> routes = routesDao.load();
         for (Route r : routes) {
-            String itemText = r.getName() + " : " + r.getRailroad();
-            if (r.getStops().size() > 1) {
-                itemText +=  "     ( " + r.getStops().get(0).getName() + " -> " +
-                        r.getStops().get(r.getStops().size() - 1).getName() + " )";
+            String itemText = r.getName() + " : " + r.getRailroad().getMark();
+            if (r.getLocations().size() > 1) {
+                itemText +=  "     ( " + r.getLocations().get(0).getName() + " -> " +
+                        r.getLocations().get(r.getLocations().size() - 1).getName() + " )";
                 if (r.getSwitchListId() > 0) {
                     itemText += "    [IN PROGRESS]";
                 }
             }
             TreeItem<String> routeItem = new TreeItem<>(itemText);
 
-            for (Location l : r.getStops()) {
+            for (Location l : r.getLocations()) {
                 routeItem.getChildren().add(new TreeItem<>(l.getName()));
             }
 
             root.getChildren().add(routeItem);
         }
         treeRoutes.setRoot(root);
-        treeRoutes.refresh();*/
+        treeRoutes.refresh();
     }
 }
