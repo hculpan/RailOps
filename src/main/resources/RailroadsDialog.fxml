@@ -23,7 +23,7 @@
       <TableView fx:id="tableRailroads" layoutX="14.0" layoutY="14.0" onMouseClicked="#itemSelected" prefHeight="337.0" prefWidth="328.0">
         <columns>
           <TableColumn editable="false" prefWidth="100.0" resizable="false" sortable="false" text="Reporting Mark">
-             <cellValueFactory><PropertyValueFactory property="reportingMark" /></cellValueFactory>
+             <cellValueFactory><PropertyValueFactory property="mark" /></cellValueFactory>
           </TableColumn>
           <TableColumn editable="false" prefWidth="225.0" resizable="false" sortable="false" text="Railroad Name">
              <cellValueFactory><PropertyValueFactory property="name" /></cellValueFactory>

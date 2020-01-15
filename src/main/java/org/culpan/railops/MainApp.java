@@ -5,11 +5,18 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.culpan.railops.dao.Datastore;
+import org.culpan.railops.dao.*;
+import org.culpan.railops.dao.annotations.Column;
+import org.culpan.railops.model.*;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MainApp extends Application {
     @Override
@@ -32,10 +39,11 @@ public class MainApp extends Application {
             launch();
         } catch (Throwable t) {
             t.printStackTrace();
+            System.exit(0);
         }
 
         try {
-            Datastore.instance.closeDb();
+            BaseDao.closeDb();
         } catch (SQLException e) {
             e.printStackTrace();
             return;

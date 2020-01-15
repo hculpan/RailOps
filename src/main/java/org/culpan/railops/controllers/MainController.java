@@ -112,7 +112,7 @@ public class MainController implements Initializable {
         TreeItem<String> item = treeRoutes.getSelectionModel().getSelectedItem();
         if (item != null && !item.getValue().isEmpty() && (index = item.getValue().indexOf(" : ")) > -1) {
             String name = item.getValue().substring(0, index);
-            return routesDao.find(name);
+            return null; // routesDao.find(name);
         }
 
         return null;
@@ -133,7 +133,7 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        treeRoutes.setShowRoot(false);
+/*        treeRoutes.setShowRoot(false);
         TreeItem<String> root = new TreeItem<>();
         root.setExpanded(true);
 
@@ -156,6 +156,6 @@ public class MainController implements Initializable {
             root.getChildren().add(routeItem);
         }
         treeRoutes.setRoot(root);
-        treeRoutes.refresh();
+        treeRoutes.refresh();*/
     }
 }

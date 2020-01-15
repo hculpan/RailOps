@@ -8,18 +8,20 @@ import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import org.culpan.railops.dao.Datastore;
-import org.culpan.railops.dao.LocationsDao;
-import org.culpan.railops.dao.WaybillDao;
-import org.culpan.railops.model.Location;
-import org.culpan.railops.model.Waybill;
-import org.culpan.railops.model.WaybillStop;
+import org.culpan.railops.dao.*;
+import org.culpan.railops.model.*;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class WaybillEntryDialogController {
     private final static WaybillDao waybillDao = new WaybillDao();
+    private final static WaybillStopsDao waybillStopsDao = new WaybillStopsDao();
+    private final static LocationsDao locationsDao = new LocationsDao();
+    private final static RailroadsDao railroadsDao = new RailroadsDao();
+    private final static CarTypesByLocationDao carTypesByLocationDao = new CarTypesByLocationDao();
+    private final static CarsDao carsDao = new CarsDao();
 
     @FXML
     public TextField textCarId;
@@ -55,22 +57,19 @@ public class WaybillEntryDialogController {
     @FXML TextField textShipper4;
     @FXML TextField textShipperAddress4;
 
-    private List<String> railroads = null;
+    private List<Railroad> railroads = null;
 
     private void updateRailroadsChoice(String location, ChoiceBox<String> routing) {
-        try {
-            List<String> servingRailroads = Datastore.instance.loadLocationRailroads(location);
+            List<String> servingRailroads = railroadsDao.loadRailroadsByLocation(locationsDao.findByName(location))
+                    .stream().map(Railroad::getMark).collect(Collectors.toList());
             routing.getItems().clear();
             routing.getItems().addAll(servingRailroads);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     public void initialize() {
         try {
             if (railroads == null) {
-                railroads = Datastore.instance.loadRailroadMarks();
+                railroads = railroadsDao.load();
             }
 
             choiceDestination1.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
@@ -101,10 +100,9 @@ public class WaybillEntryDialogController {
                 }
             });
 
-            LocationsDao locationsDao = new LocationsDao();
             List<Location> locations = locationsDao.load();
             for (Location l : locations) {
-                if (Datastore.instance.existsLocationCarType(l.getName(), textAarCode.getText())) {
+                if (carTypesByLocationDao.existsForLocation(l, textAarCode.getText())) {
                     choiceDestination1.getItems().add(l.getName());
                     choiceDestination2.getItems().add(l.getName());
                     choiceDestination3.getItems().add(l.getName());
@@ -112,7 +110,7 @@ public class WaybillEntryDialogController {
                 }
             }
 
-            if (Datastore.instance.carWaybillExists(textCarId.getText())) {
+            if (waybillDao.existsForCarRoadId(textCarId.getText())) {
                 loadWaybillData();
             }
         } catch (SQLException e) {
@@ -153,50 +151,50 @@ public class WaybillEntryDialogController {
 
     @SuppressWarnings("Duplicates")
     private void loadWaybillData() throws SQLException {
-        Waybill waybill = waybillDao.findWaybill(textCarId.getText());
+        Waybill waybill = waybillDao.findByRoadId(textCarId.getText());
 
         if (waybill.getStops().size() > 0) {
             WaybillStop stop = waybill.getStops().get(0);
             textConsignee1.setText(stop.getConsignee());
-            choiceDestination1.setValue(stop.getDestination());
-            updateRailroadsChoice(stop.getDestination(), choiceRouting1);
+            choiceDestination1.setValue((stop.getLocation() != null ? stop.getLocation().getName() : ""));
+            updateRailroadsChoice((stop.getLocation() != null ? stop.getLocation().getName() : ""), choiceRouting1);
             choiceRouting1.setValue(stop.getRouting());
             textLading1.setText(stop.getLading());
             textShipper1.setText(stop.getShipper());
-            textShipperAddress1.setText(stop.getShipper_address());
+            textShipperAddress1.setText(stop.getShipperAddress());
         }
 
         if (waybill.getStops().size() > 1) {
             WaybillStop stop = waybill.getStops().get(1);
             textConsignee2.setText(stop.getConsignee());
-            choiceDestination2.setValue(stop.getDestination());
-            updateRailroadsChoice(stop.getDestination(), choiceRouting2);
+            choiceDestination2.setValue((stop.getLocation() != null ? stop.getLocation().getName() : ""));
+            updateRailroadsChoice((stop.getLocation() != null ? stop.getLocation().getName() : ""), choiceRouting2);
             choiceRouting2.setValue(stop.getRouting());
             textLading2.setText(stop.getLading());
             textShipper2.setText(stop.getShipper());
-            textShipperAddress2.setText(stop.getShipper_address());
+            textShipperAddress2.setText(stop.getShipperAddress());
         }
 
         if (waybill.getStops().size() > 2) {
             WaybillStop stop = waybill.getStops().get(2);
             textConsignee3.setText(stop.getConsignee());
-            choiceDestination3.setValue(stop.getDestination());
-            updateRailroadsChoice(stop.getDestination(), choiceRouting3);
+            choiceDestination3.setValue((stop.getLocation() != null ? stop.getLocation().getName() : ""));
+            updateRailroadsChoice((stop.getLocation() != null ? stop.getLocation().getName() : null), choiceRouting3);
             choiceRouting3.setValue(stop.getRouting());
             textLading3.setText(stop.getLading());
             textShipper3.setText(stop.getShipper());
-            textShipperAddress3.setText(stop.getShipper_address());
+            textShipperAddress3.setText(stop.getShipperAddress());
         }
 
         if (waybill.getStops().size() > 3) {
             WaybillStop stop = waybill.getStops().get(3);
             textConsignee4.setText(stop.getConsignee());
-            choiceDestination4.setValue(stop.getDestination());
-            updateRailroadsChoice(stop.getDestination(), choiceRouting4);
+            choiceDestination4.setValue((stop.getLocation() != null ? stop.getLocation().getName() : ""));
+            updateRailroadsChoice((stop.getLocation() != null ? stop.getLocation().getName() : null), choiceRouting4);
             choiceRouting4.setValue(stop.getRouting());
             textLading4.setText(stop.getLading());
             textShipper4.setText(stop.getShipper());
-            textShipperAddress4.setText(stop.getShipper_address());
+            textShipperAddress4.setText(stop.getShipperAddress());
         }
     }
 
@@ -206,11 +204,11 @@ public class WaybillEntryDialogController {
             LocationsDao locationsDao = new LocationsDao();
             WaybillStop stop1 = new WaybillStop();
             stop1.setConsignee(consignee);
-            stop1.setLocation(locationsDao.find(dest));
+            stop1.setLocation(locationsDao.findByName(dest));
             stop1.setRouting(routing);
             stop1.setLading(lading);
             stop1.setShipper(shipper);
-            stop1.setShipper_address(shipperAddress);
+            stop1.setShipperAddress(shipperAddress);
             stop1.setSequence(sequence);
             return stop1;
         }
@@ -219,6 +217,9 @@ public class WaybillEntryDialogController {
     }
 
     public void okClicked(ActionEvent event) {
+        Waybill waybill = waybillDao.findByRoadId(textCarId.getText());
+        Car c = carsDao.findByRoadId(textCarId.getText());
+
         WaybillStop stop1 = createStop(textConsignee1.getText(),
             choiceDestination1.getValue(),
             choiceRouting1.getValue(),
@@ -247,21 +248,28 @@ public class WaybillEntryDialogController {
                 textShipper4.getText(),
                 textShipperAddress4.getText(), 4);
 
-        Waybill waybill = new Waybill();
+        if (waybill == null) {
+            waybill = new Waybill();
+            if (c != null) waybill.setCarId(c.getId());
+        } else {
+            waybillStopsDao.deleteAllForWaybill(waybill);
+        }
+
+        waybill.getStops().clear();
         if (stop1 != null) waybill.getStops().add(stop1);
         if (stop2 != null) waybill.getStops().add(stop2);
         if (stop3 != null) waybill.getStops().add(stop3);
         if (stop4 != null) waybill.getStops().add(stop4);
-        waybill.setCarId(textCarId.getText());
 
-        try {
-            if (waybill.getStops().size() > 0) {
-                Datastore.instance.addOrUpdate(waybill);
-            } else {
-                Datastore.instance.delete(waybill);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (waybill.getStops().size() > 0) {
+            waybillDao.addOrUpdate(waybill);
+            c.setWaybill(waybill);
+            carsDao.addOrUpdate(c);
+        } else {
+            waybillDao.delete(waybill);
+            c.setWaybill(null);
+            c.setWaybillId(0);
+            carsDao.addOrUpdate(c);
         }
 
         Node source = (Node)event.getSource();

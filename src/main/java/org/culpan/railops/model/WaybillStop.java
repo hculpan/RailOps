@@ -1,21 +1,38 @@
 package org.culpan.railops.model;
 
-public class WaybillStop {
-    private int sequence;
+import org.culpan.railops.dao.LocationsDao;
+import org.culpan.railops.dao.annotations.Column;
+import org.culpan.railops.dao.annotations.OneToOne;
+import org.culpan.railops.dao.annotations.Table;
+
+@Table(name = "waybill_stops")
+public class WaybillStop extends BaseModel {
+    @Column
     private String consignee;
-    private Location location;
+
+    @Column
     private String routing;
+
+    @Column
     private String shipper;
-    private String shipper_address;
+
+    @Column(name = "shipper_address")
+    private String shipperAddress;
+
+    @Column
     private String lading;
 
-    public int getSequence() {
-        return sequence;
-    }
+    @Column(name = "location_id")
+    private int locationId;
 
-    public void setSequence(int sequence) {
-        this.sequence = sequence;
-    }
+    @OneToOne(fieldName = "locationId", dao = LocationsDao.class)
+    private Location location;
+
+    @Column(name = "waybill_id")
+    private int waybillId;
+
+    @Column
+    private int sequence;
 
     public String getConsignee() {
         return consignee;
@@ -23,18 +40,6 @@ public class WaybillStop {
 
     public void setConsignee(String consignee) {
         this.consignee = consignee;
-    }
-
-    public Location getLocation() {
-        return location;
-    }
-
-    public void setLocation(Location location) {
-        this.location = location;
-    }
-
-    public String getDestination() {
-        return (location != null ? location.getName() : null);
     }
 
     public String getRouting() {
@@ -53,12 +58,12 @@ public class WaybillStop {
         this.shipper = shipper;
     }
 
-    public String getShipper_address() {
-        return shipper_address;
+    public String getShipperAddress() {
+        return shipperAddress;
     }
 
-    public void setShipper_address(String shipper_address) {
-        this.shipper_address = shipper_address;
+    public void setShipperAddress(String shipperAddress) {
+        this.shipperAddress = shipperAddress;
     }
 
     public String getLading() {
@@ -67,5 +72,38 @@ public class WaybillStop {
 
     public void setLading(String lading) {
         this.lading = lading;
+    }
+
+    public int getLocationId() {
+        return locationId;
+    }
+
+    public void setLocationId(int locationId) {
+        this.locationId = locationId;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+        setLocationId(location.getId());
+    }
+
+    public int getWaybillId() {
+        return waybillId;
+    }
+
+    public void setWaybillId(int waybillId) {
+        this.waybillId = waybillId;
+    }
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
     }
 }

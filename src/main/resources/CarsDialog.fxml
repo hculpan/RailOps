@@ -26,16 +26,13 @@
                 <cellValueFactory><PropertyValueFactory property="aarCode" /></cellValueFactory>
             </TableColumn>
             <TableColumn prefWidth="50.0" text="R.R.">
-                <cellValueFactory><PropertyValueFactory property="mark" /></cellValueFactory>
+                <cellValueFactory><PropertyValueFactory property="roadMark" /></cellValueFactory>
             </TableColumn>
             <TableColumn prefWidth="125.0" text="ID">
-                <cellValueFactory><PropertyValueFactory property="id" /></cellValueFactory>
+                <cellValueFactory><PropertyValueFactory property="roadId" /></cellValueFactory>
             </TableColumn>
             <TableColumn editable="false" prefWidth="215.0" resizable="false" sortable="false" text="Location">
-                <cellValueFactory><PropertyValueFactory property="location" /></cellValueFactory>
-            </TableColumn>
-            <TableColumn prefWidth="50.0" text="Waybill">
-                <cellValueFactory><PropertyValueFactory property="waybill" /></cellValueFactory>
+<!--                <cellValueFactory><PropertyValueFactory property="location.name" /></cellValueFactory> -->
             </TableColumn>
         </columns>
       </TableView>

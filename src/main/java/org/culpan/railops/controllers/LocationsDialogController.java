@@ -10,19 +10,26 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-import org.culpan.railops.dao.Datastore;
+import org.culpan.railops.dao.CarTypesByLocationDao;
 import org.culpan.railops.dao.LocationsDao;
+import org.culpan.railops.dao.RailroadsDao;
 import org.culpan.railops.model.Car;
+import org.culpan.railops.model.CarTypesByLocation;
 import org.culpan.railops.model.Location;
+import org.culpan.railops.model.Railroad;
 
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public class LocationsDialogController  implements Initializable {
+    private final static RailroadsDao railroadsDao = new RailroadsDao();
+    private final static LocationsDao locationsDao = new LocationsDao();
+    private final static CarTypesByLocationDao carTypeByLocationDao = new CarTypesByLocationDao();
+
     private enum ItemType { itLocation, itCarType, itCarTypeHeader, itRailroad, itRailroadHeader };
 
     private final static String CARS_SERVICED_HEADER = "Car Types Serviced";
@@ -69,72 +76,73 @@ public class LocationsDialogController  implements Initializable {
     public void add(ActionEvent event) {
         TreeItem<String> item = treeLocations.getSelectionModel().getSelectedItem();
 
-        try {
-            switch (getItemType(item)) {
-                case itLocation:
-                    TextInputDialog textInputDialog = new TextInputDialog();
-                    textInputDialog.setTitle("New Location");
-                    textInputDialog.setHeaderText("Give the name of the new location");
-                    textInputDialog.setContentText("Location:");
-                    Optional<String> result = textInputDialog.showAndWait();
-                    result.ifPresent(name -> {
-                        Location location = new Location(name);
-                        LocationsDao locationsDao = new LocationsDao();
+        switch (getItemType(item)) {
+            case itLocation:
+                TextInputDialog textInputDialog = new TextInputDialog();
+                textInputDialog.setTitle("New Location");
+                textInputDialog.setHeaderText("Give the name of the new location");
+                textInputDialog.setContentText("Location:");
+                Optional<String> result = textInputDialog.showAndWait();
+                result.ifPresent(name -> {
+                        Location location = new Location();
+                        location.setName(name);
+                        location.setStaging(false);
                         locationsDao.addOrUpdate(location);
-                    });
-                    break;
-                case itCarTypeHeader:
-                case itCarType:
-                    List<String> carTypes = new ArrayList<>();
-                    carTypes.addAll(Car.aarCodes);
-                    carTypes.add("All");
-                    ChoiceDialog<String> choiceDialog = new ChoiceDialog<>(carTypes.get(0), carTypes);
-                    choiceDialog.setTitle("New Car Type");
-                    choiceDialog.setHeaderText("Select a new car type to be serviced at this location");
-                    choiceDialog.setContentText("Car Type:");
-                    result = choiceDialog.showAndWait();
-                    result.ifPresent(aarCode -> {
-                        try {
-                            if (aarCode.equalsIgnoreCase("all")) {
-                                for (String carType : Car.aarCodes) {
-                                    Datastore.instance.addLocationCarType(getLocationName(item), carType);
-                                }
-                            } else {
-                                Datastore.instance.addLocationCarType(getLocationName(item), aarCode);
+                });
+                break;
+            case itCarTypeHeader:
+            case itCarType:
+                List<String> carTypes = new ArrayList<>();
+                carTypes.addAll(Car.aarCodes);
+                carTypes.add("All");
+                ChoiceDialog<String> choiceDialog = new ChoiceDialog<>(carTypes.get(0), carTypes);
+                choiceDialog.setTitle("New Car Type");
+                choiceDialog.setHeaderText("Select a new car type to be serviced at this location");
+                choiceDialog.setContentText("Car Type:");
+                result = choiceDialog.showAndWait();
+                result.ifPresent(aarCode -> {
+                    Location l = locationsDao.findByName(getLocationName(item));
+                    if (aarCode.equalsIgnoreCase("all")) {
+                        for (String carType : Car.aarCodes) {
+                            CarTypesByLocation c = new CarTypesByLocation();
+                            c.setLocationId(l.getId());
+                            c.setAarCode(carType);
+                            if (!carTypeByLocationDao.existsForLocation(l, carType)) {
+                                carTypeByLocationDao.addOrUpdate(c);
                             }
-                        } catch (SQLException e) {
-                            e.printStackTrace();
                         }
-                    });
-                    break;
-                case itRailroadHeader:
-                case itRailroad:
-                    List<String> railroads = Datastore.instance.loadRailroadMarks();
-                    railroads.add("All");
-                    choiceDialog = new ChoiceDialog<>((railroads.size() > 0 ? railroads.get(0) : ""), railroads);
-                    choiceDialog.setTitle("New Railroad Service");
-                    choiceDialog.setHeaderText("Select a railroad to service this location");
-                    choiceDialog.setContentText("Railroad:");
-                    result = choiceDialog.showAndWait();
-                    result.ifPresent(rr -> {
-                        try {
-                            if (rr.equalsIgnoreCase("all")) {
-                                for (String railroad : railroads) {
-                                    if (!railroad.equalsIgnoreCase("all")) {
-                                        Datastore.instance.addLocationRailroad(getLocationName(item), railroad);
-                                    }
-                                }
-                            } else {
-                                Datastore.instance.addLocationRailroad(getLocationName(item), rr);
+                    } else {
+                        CarTypesByLocation c = new CarTypesByLocation();
+                        c.setLocationId(locationsDao.findByName(getLocationName(item)).getId());
+                        c.setAarCode(aarCode);
+                        if (!carTypeByLocationDao.existsForLocation(l, aarCode)) {
+                            carTypeByLocationDao.addOrUpdate(c);
+                        }
+                    }
+                });
+                break;
+            case itRailroadHeader:
+            case itRailroad:
+                List<String> railroads = railroadsDao.load().stream().map(Railroad::getMark).collect(Collectors.toList());
+                railroads.add("All");
+                choiceDialog = new ChoiceDialog<>((railroads.size() > 0 ? railroads.get(0) : ""), railroads);
+                choiceDialog.setTitle("New Railroad Service");
+                choiceDialog.setHeaderText("Select a railroad to service this location");
+                choiceDialog.setContentText("Railroad:");
+                result = choiceDialog.showAndWait();
+                String locationName = getLocationName(item);
+                result.ifPresent(rr -> {
+                    if (rr.equalsIgnoreCase("all")) {
+                        for (String railroad : railroads) {
+                            if (!railroad.equalsIgnoreCase("all")) {
+                                railroadsDao.addRailroadForLocation(railroadsDao.findByMark(railroad), locationsDao.findByName(locationName));
                             }
-                        } catch (SQLException e) {
-                            e.printStackTrace();
                         }
-                    });
-                    break;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+                    } else {
+                        railroadsDao.addRailroadForLocation(railroadsDao.findByMark(rr), locationsDao.findByName(locationName));
+                    }
+                });
+                break;
         }
 
         initialize(null, null);
@@ -146,20 +154,18 @@ public class LocationsDialogController  implements Initializable {
 
         LocationsDao locationsDao = new LocationsDao();
 
-        try {
-            switch (getItemType(item)) {
-                case itLocation:
-                    locationsDao.delete(locationsDao.find(getLocationName(item)));
-                    break;
-                case itCarType:
-                    Datastore.instance.deleteLocationCarType(getLocationName(item), item.getValue());
-                    break;
-                case itRailroad:
-                    Datastore.instance.deleteLocationRailroad(getLocationName(item), item.getValue());
-                    break;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        switch (getItemType(item)) {
+            case itLocation:
+                locationsDao.delete(locationsDao.findByName(getLocationName(item)));
+                break;
+            case itCarType:
+                carTypeByLocationDao.deleteForLocation(locationsDao.findByName(getLocationName(item)), item.getValue());
+                break;
+            case itRailroad:
+                railroadsDao.deleteRailroadForlocation(
+                        railroadsDao.findByMark(item.getValue()),
+                        locationsDao.findByName(getLocationName(item)));
+                break;
         }
 
         initialize(null, null);
@@ -181,15 +187,15 @@ public class LocationsDialogController  implements Initializable {
             loc.setExpanded(true);
 
             TreeItem<String> cars = new TreeItem<>(CARS_SERVICED_HEADER);
-            for (String s : location.getCarsTypes()) {
-                TreeItem<String> i = new TreeItem<>(s);
+            for (CarTypesByLocation s : location.getCarTypesByLocations()) {
+                TreeItem<String> i = new TreeItem<>(s.getAarCode());
                 cars.getChildren().add(i);
             }
             loc.getChildren().add(cars);
 
             TreeItem<String> railroads = new TreeItem<>(RAILROADS_SERVICING);
-            for (String s : location.getRailroads()) {
-                TreeItem<String> i = new TreeItem<>(s);
+            for (Railroad r : railroadsDao.loadRailroadsByLocation(location)) {
+                TreeItem<String> i = new TreeItem<>(r.getMark());
                 railroads.getChildren().add(i);
             }
             loc.getChildren().add(railroads);

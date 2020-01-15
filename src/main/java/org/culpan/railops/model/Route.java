@@ -1,59 +1,46 @@
 package org.culpan.railops.model;
 
-import javafx.beans.property.SimpleStringProperty;
+import org.culpan.railops.dao.annotations.Column;
 
-import java.util.ArrayList;
-import java.util.List;
+public class Route extends BaseModel {
+    @Column
+    private String name;
 
-public class Route {
-    private int id;
+    @Column(name = "railroad_id")
+    private int railroadId;
 
-    private final SimpleStringProperty name = new SimpleStringProperty();
-    private final SimpleStringProperty railroad = new SimpleStringProperty();
+    private Railroad railroad;
 
-    private final List<Location> stops = new ArrayList<>();
-
+    @Column(name = "switch_list_id")
     private int switchListId;
 
-    public Route(String name, String railroad) {
-        setName(name);
-        setRailroad(railroad);
-    }
+    private SwitchList switchList;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+    public Route() {
     }
 
     public String getName() {
-        return name.get();
-    }
-
-    public SimpleStringProperty nameProperty() {
         return name;
     }
 
     public void setName(String name) {
-        this.name.set(name);
+        this.name = name;
     }
 
-    public String getRailroad() {
-        return railroad.get();
+    public int getRailroadId() {
+        return railroadId;
     }
 
-    public SimpleStringProperty railroadProperty() {
+    public void setRailroadId(int railroadId) {
+        this.railroadId = railroadId;
+    }
+
+    public Railroad getRailroad() {
         return railroad;
     }
 
-    public void setRailroad(String railroad) {
-        this.railroad.set(railroad);
-    }
-
-    public List<Location> getStops() {
-        return stops;
+    public void setRailroad(Railroad railroad) {
+        this.railroad = railroad;
     }
 
     public int getSwitchListId() {
@@ -62,5 +49,13 @@ public class Route {
 
     public void setSwitchListId(int switchListId) {
         this.switchListId = switchListId;
+    }
+
+    public SwitchList getSwitchList() {
+        return switchList;
+    }
+
+    public void setSwitchList(SwitchList switchList) {
+        this.switchList = switchList;
     }
 }

@@ -7,24 +7,26 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import org.culpan.railops.dao.Datastore;
+import org.culpan.railops.dao.BaseDao;
 import org.culpan.railops.dao.LocationsDao;
+import org.culpan.railops.dao.RailroadsDao;
 import org.culpan.railops.dao.RoutesDao;
-import org.culpan.railops.model.Location;
 import org.culpan.railops.model.Railroad;
 import org.culpan.railops.model.Route;
+import org.culpan.railops.util.AppHelper;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RouteEditDialogController {
-    private LocationsDao locationsDao = new LocationsDao();
-    private RoutesDao routesDao = new RoutesDao();
+    private final static LocationsDao locationsDao = new LocationsDao();
+    private final static RoutesDao routesDao = new RoutesDao();
+    private final static RailroadsDao railroadsDao = new RailroadsDao();
 
     private Route route;
 
@@ -44,36 +46,32 @@ public class RouteEditDialogController {
 
     public void initialize(Route r) {
         this.route = r;
-        try {
-            List<String> railroads = Datastore.instance.loadRailroadMarks();
-            choiceRailroad.setItems(FXCollections.observableList(railroads));
-            listStops.setItems(stops);
-        } catch (SQLException e) {
-            Datastore.instance.logDbError(e);
-        }
+        List<String> railroads = railroadsDao.load().stream().map(Railroad::getMark).collect(Collectors.toList());
+        choiceRailroad.setItems(FXCollections.observableList(railroads));
+        listStops.setItems(stops);
 
         choiceRailroad.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number number2) {
-                String choice = choiceRailroad.getItems().get((Integer) number2);
+/*                String choice = choiceRailroad.getItems().get((Integer) number2);
                 List<Location> locations = locationsDao.allLocationsForRailroad(choice);
                 if (locations != null) {
                     choiceDestination.getItems().clear();
                     for (Location l : locations) {
                         choiceDestination.getItems().add(l.getName());
                     }
-                }
+                }*/
             }
         });
 
         if (r != null) {
             textName.setText(r.getName());
-            choiceRailroad.setValue(r.getRailroad());
+            choiceRailroad.setValue(r.getRailroad().getMark());
 
             stops.clear();
-            for (Location l : r.getStops()) {
+/*            for (Location l : r.getStops()) {
                 stops.add(l.getName());
-            }
+            }*/
         }
     }
 
@@ -115,12 +113,12 @@ public class RouteEditDialogController {
         if (choiceRailroad.getValue() == null || choiceRailroad.getValue().isEmpty()) return;
 
         if (route == null) {
-            route = new Route(textName.getText(), choiceRailroad.getValue());
+//            route = new Route(textName.getText(), choiceRailroad.getValue());
         }
 
-        route.getStops().clear();
+//        route.getStops().clear();
         for (String s : stops) {
-            Location l = locationsDao.find(s);
+/*            Location l = locationsDao.find(s);
             if (!locationsDao.doesRailroadServeLocation(choiceRailroad.getValue(), l)) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Invalid Stop");
@@ -129,7 +127,7 @@ public class RouteEditDialogController {
                 alert.showAndWait();
                 return;
             }
-            route.getStops().add(l);
+            route.getStops().add(l);*/
         }
 
         routesDao.addOrUpdate(route);

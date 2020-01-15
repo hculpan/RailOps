@@ -1,14 +1,17 @@
 package org.culpan.railops.model;
 
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
+import org.culpan.railops.dao.LocationsDao;
+import org.culpan.railops.dao.WaybillDao;
+import org.culpan.railops.dao.annotations.Column;
+import org.culpan.railops.dao.annotations.OneToOne;
+import org.culpan.railops.dao.annotations.Table;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
-public class Car {
+@Table(name = "cars")
+public class Car extends BaseModel {
     public final static List<String> aarCodes = new ArrayList<>(Arrays.asList(
             "F - Flat",
             "G - Gondola",
@@ -21,115 +24,106 @@ public class Car {
             "MW - Maintenance of way"
     ));
 
-    private final SimpleStringProperty kind = new SimpleStringProperty();
-    private final SimpleStringProperty mark = new SimpleStringProperty();
-    private final SimpleStringProperty aarCode = new SimpleStringProperty();
-    private final SimpleStringProperty id = new SimpleStringProperty();
-    private final SimpleStringProperty description = new SimpleStringProperty();
-    private final SimpleBooleanProperty waybill = new SimpleBooleanProperty();
-    private final SimpleStringProperty location = new SimpleStringProperty();
+    @Column
+    private String kind;
 
-    private int waybillSequence = 0;
-    private boolean switching = false;
+    @Column(name = "road_mark")
+    private String roadMark;
 
-    public Car() {}
+    @Column(name = "road_id")
+    private String roadId;
 
-    public Car(String kind, String mark, String id, String aarCode, String description, String location) {
-        this(kind, mark, id, aarCode, description, location, 0);
+    @Column
+    private String description;
+
+    @Column
+    private String aarCode;
+
+    @Column(name = "location_id")
+    private int locationId;
+
+    @OneToOne(fieldName = "locationId", dao = LocationsDao.class)
+    private Location location;
+
+    @Column(name = "waybill_sequence")
+    private int waybillSequence;
+
+    @Column
+    private boolean switching;
+
+    @Column(name = "waybill_id")
+    private int waybillId;
+
+    @OneToOne(fieldName = "waybillId", dao = WaybillDao.class)
+    private Waybill waybill;
+
+    public Car() {
+
     }
 
-    public Car(String kind, String mark, String id, String aarCode, String description, String location, int waybillSequence) {
-        setKind(kind);
-        setMark(mark);
-        setId(id);
-        setAarCode(aarCode);
-        setDescription(description);
-        setLocation(location);
-        setWaybillSequence(waybillSequence);
+    public boolean hasWaybill() {
+        return waybillId > 0;
+    }
+
+    public static List<String> getAarCodes() {
+        return aarCodes;
     }
 
     public String getKind() {
-        return kind.get();
-    }
-
-    public SimpleStringProperty kindProperty() {
         return kind;
     }
 
     public void setKind(String kind) {
-        this.kind.set(kind);
+        this.kind = kind;
     }
 
-    public String getMark() {
-        return mark.get();
+    public String getRoadMark() {
+        return roadMark;
     }
 
-    public SimpleStringProperty markProperty() {
-        return mark;
+    public void setRoadMark(String roadMark) {
+        this.roadMark = roadMark;
     }
 
-    public void setMark(String mark) {
-        this.mark.set(mark);
+    public String getRoadId() {
+        return roadId;
     }
 
-    public String getId() {
-        return id.get();
-    }
-
-    public SimpleStringProperty idProperty() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id.set(id);
+    public void setRoadId(String roadId) {
+        this.roadId = roadId;
     }
 
     public String getDescription() {
-        return description.get();
-    }
-
-    public SimpleStringProperty descriptionProperty() {
         return description;
     }
 
     public void setDescription(String description) {
-        this.description.set(description);
+        this.description = description;
     }
 
     public String getAarCode() {
-        return aarCode.get();
-    }
-
-    public SimpleStringProperty aarCodeProperty() {
         return aarCode;
     }
 
-    public void setAarCode(String aar) {
-        this.aarCode.set(aar);
+    public void setAarCode(String aarCode) {
+        this.aarCode = aarCode;
     }
 
-    public boolean isWaybill() {
-        return waybill.get();
+    public int getLocationId() {
+        return locationId;
     }
 
-    public SimpleBooleanProperty waybillProperty() {
-        return waybill;
+    public void setLocationId(int locationId) {
+        this.locationId = locationId;
     }
 
-    public void setWaybill(boolean waybill) {
-        this.waybill.set(waybill);
-    }
-
-    public String getLocation() {
-        return location.get();
-    }
-
-    public SimpleStringProperty locationProperty() {
+    public Location getLocation() {
         return location;
     }
 
-    public void setLocation(String location) {
-        this.location.set(location);
+    public void setLocation(Location location) {
+        this.location = location;
+        if (location != null) setLocationId(location.getId());
     }
 
     public int getWaybillSequence() {
@@ -148,20 +142,20 @@ public class Car {
         this.switching = switching;
     }
 
-    public int getSwitchingValue() {
-        return (isSwitching() ? 1 : 0);
+    public int getWaybillId() {
+        return waybillId;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Car)) return false;
-        Car car = (Car) o;
-        return Objects.equals(id, car.id);
+    public void setWaybillId(int waybillId) {
+        this.waybillId = waybillId;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
+    public Waybill getWaybill() {
+        return waybill;
+    }
+
+    public void setWaybill(Waybill waybill) {
+        this.waybill = waybill;
+        if (waybill != null) setWaybillId(waybill.getId());
     }
 }
