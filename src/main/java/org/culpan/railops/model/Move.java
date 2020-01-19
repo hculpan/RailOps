@@ -1,14 +1,14 @@
 package org.culpan.railops.model;
 
 import org.culpan.railops.dao.annotations.Column;
+import org.culpan.railops.dao.annotations.Table;
 
+@Table(name = "moves")
 public class Move extends BaseModel {
-    public enum MoveType { mtPickUp, mtSetOut, mtPickupLocomotive, mtDropoffLocmotive };
+    public enum ActionType { atPickUp, atSetOut, atPickupLocomotive, atDropoffLocmotive };
 
     @Column(name = "car_id")
     private int carId;
-
-    private Car car;
 
     @Column
     private String action;
@@ -24,24 +24,24 @@ public class Move extends BaseModel {
     @Column
     private String lading;
 
-    public MoveType getMoveType() {
+    public ActionType getActionType() {
         if (getAction().equalsIgnoreCase("pick up")) {
-            return MoveType.mtPickUp;
+            return ActionType.atPickUp;
         } else if (getAction().equalsIgnoreCase("set out")) {
-            return MoveType.mtSetOut;
+            return ActionType.atSetOut;
         } else if (getAction().equalsIgnoreCase("start")) {
-            return MoveType.mtPickupLocomotive;
+            return ActionType.atPickupLocomotive;
         } else {
-            return MoveType.mtDropoffLocmotive;
+            return ActionType.atDropoffLocmotive;
         }
     }
 
-    public void setMove(MoveType type) {
-        if (type == MoveType.mtPickUp) {
+    public void setAction(ActionType type) {
+        if (type == ActionType.atPickUp) {
             setAction("Pick up");
-        } else if (type == MoveType.mtSetOut) {
+        } else if (type == ActionType.atSetOut) {
             setAction("Set out");
-        } else if (type == MoveType.mtPickupLocomotive) {
+        } else if (type == ActionType.atPickupLocomotive) {
             setAction("Start");
         } else {
             setAction("End");
@@ -54,14 +54,6 @@ public class Move extends BaseModel {
 
     public void setCarId(int carId) {
         this.carId = carId;
-    }
-
-    public Car getCar() {
-        return car;
-    }
-
-    public void setCar(Car car) {
-        this.car = car;
     }
 
     public String getAction() {
@@ -103,4 +95,5 @@ public class Move extends BaseModel {
     public void setLading(String lading) {
         this.lading = lading;
     }
+
 }

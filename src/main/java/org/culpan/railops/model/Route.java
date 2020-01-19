@@ -12,6 +12,9 @@ import java.util.List;
 @Table(name = "routes")
 public class Route extends BaseModel {
     @Column
+    private String identifier;
+
+    @Column
     private String name;
 
     @Column(name = "railroad_id")
@@ -29,6 +32,14 @@ public class Route extends BaseModel {
     private final List<Location> locations = new ArrayList<>();
 
     public Route() {
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
     }
 
     public String getName() {
@@ -77,5 +88,24 @@ public class Route extends BaseModel {
 
     public List<Location> getLocations() {
         return locations;
+    }
+
+    public String getDisplayName() {
+        String result;
+
+        if ((getName() == null || getName().isBlank()) && getRailroad() != null) {
+            result = String.format("%s #%s",
+                    getRailroad().getDisplayName(),
+                    getIdentifier());
+        } else if (getName() == null || getName().isBlank()) {
+            result = String.format("Train #%s",
+                    getIdentifier());
+        } else {
+            result = String.format("%s #%s",
+                    getName(),
+                    getIdentifier());
+        }
+
+        return result;
     }
 }

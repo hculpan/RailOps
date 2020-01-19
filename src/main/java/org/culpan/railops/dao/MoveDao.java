@@ -9,7 +9,6 @@ public class MoveDao extends BaseDao<Move> implements PostInitialize<Move> {
 
     @Override
     public void initializeComplete(Move item) {
-        item.setCar(carsDao.findById(item.getCarId()));
         item.setLocation(locationsDao.findById(item.getLocationId()));
     }
 }

@@ -1,15 +1,17 @@
 package org.culpan.railops.model;
 
 import org.culpan.railops.dao.annotations.Column;
+import org.culpan.railops.dao.annotations.Table;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Table(name = "switch_lists")
 public class SwitchList extends BaseModel {
     @Column(name = "route_id")
     private int routeId;
 
-    private Route route;
+//    private Route route;
 
     @Column
     private String status;
@@ -24,13 +26,13 @@ public class SwitchList extends BaseModel {
         this.routeId = routeId;
     }
 
-    public Route getRoute() {
+/*    public Route getRoute() {
         return route;
     }
 
     public void setRoute(Route route) {
         this.route = route;
-    }
+    }*/
 
     public String getStatus() {
         return status;

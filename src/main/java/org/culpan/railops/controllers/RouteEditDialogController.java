@@ -36,6 +36,9 @@ public class RouteEditDialogController {
     ListView<String> listStops;
 
     @FXML
+    TextField textIdentifier;
+
+    @FXML
     TextField textName;
 
     @FXML
@@ -68,12 +71,13 @@ public class RouteEditDialogController {
 
         if (r != null) {
             textName.setText(r.getName());
+            textIdentifier.setText(r.getIdentifier());
             choiceRailroad.setValue(r.getRailroad().getMark());
 
             stops.clear();
-/*            for (Location l : r.getStops()) {
+            for (Location l : r.getLocations()) {
                 stops.add(l.getName());
-            }*/
+            }
         }
     }
 
@@ -111,14 +115,16 @@ public class RouteEditDialogController {
     }
 
     public void okClicked(ActionEvent event) {
-        if (textName.getText() == null || textName.getText().isEmpty()) return;
+        if (textIdentifier.getText() == null || textIdentifier.getText().isEmpty()) return;
         if (choiceRailroad.getValue() == null || choiceRailroad.getValue().isEmpty()) return;
 
         if (route == null) {
-            route = new Route(); //textName.getText(), choiceRailroad.getValue());
-            route.setName(textName.getText());
-            route.setRailroad(railroadsDao.findByMark(choiceRailroad.getValue()));
+            route = new Route();
         }
+
+        route.setName(textName.getText());
+        route.setIdentifier(textIdentifier.getText());
+        route.setRailroad(railroadsDao.findByMark(choiceRailroad.getValue()));
 
         route.getLocations().clear();
         for (String s : stops) {

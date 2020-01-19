@@ -19,7 +19,7 @@
           <TableColumn prefWidth="102.0" text="Car Type">
               <cellValueFactory><PropertyValueFactory property="carType" /></cellValueFactory>
           </TableColumn>
-          <TableColumn prefWidth="63.0" text="Railroad" >
+          <TableColumn prefWidth="63.0" text="Railroad">
               <cellValueFactory><PropertyValueFactory property="railroad" /></cellValueFactory>
           </TableColumn>
           <TableColumn prefWidth="112.0" text="Car #">
@@ -33,5 +33,6 @@
           </TableColumn>
         </columns>
       </TableView>
+      <Button layoutX="285.0" layoutY="428.0" mnemonicParsing="false" onAction="#viewReport" text="View Report" />
    </children>
 </AnchorPane>

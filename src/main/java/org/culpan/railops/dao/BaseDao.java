@@ -376,10 +376,9 @@ public abstract class BaseDao<T extends BaseModel> {
             rowCount = stmt.executeUpdate(sql);
             stmt.close();
             if (commit) connection().commit();
-            return rowCount > 0;
+            return true;
         } catch (SQLException e) {
             logDbError(e);
-
             return false;
         }
     }

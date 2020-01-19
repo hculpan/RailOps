@@ -1,6 +1,5 @@
 package org.culpan.railops.controllers;
 
-import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -9,7 +8,9 @@ import javafx.scene.control.TableView;
 import javafx.stage.Stage;
 import org.culpan.railops.dao.*;
 import org.culpan.railops.model.*;
+import org.culpan.railops.util.ReportGenerator;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,17 +119,22 @@ public class SwitchListDialogController {
     }
 
     public void rollbackClicked() {
-/*        SwitchList switchList = switchListDao.find(route.getSwitchListId());
+        SwitchList switchList = switchListDao.findById(route.getSwitchListId());
         if (switchList != null) {
             switchList.setStatus("ABORTED");
             switchListDao.addOrUpdate(switchList);
             route.setSwitchListId(0);
             routesDao.addOrUpdate(route);
             for (Move m : switchList.getMoves()) {
-                carsDao.updateSwitching(m.getCarId(), false);
+                Car car = carsDao.findById(m.getCarId());
+                if (car != null) {
+                    car.setSwitching(false);
+                    carsDao.addOrUpdate(car, false);
+                }
             }
+            carsDao.commit();
             initialize(route);
-        }*/
+        }
     }
 
     public void startSwitchList() {
@@ -140,46 +146,60 @@ public class SwitchListDialogController {
         route.setSwitchListId(switchList.getId());
         routesDao.addOrUpdate(route);
         for (Move m : switchList.getMoves()) {
-//            carsDao.updateSwitching(m.getCarId(), true);
+            Car car = carsDao.findById(m.getCarId());
+            if (car != null) {
+                car.setSwitching(true);
+                carsDao.addOrUpdate(car, false);
+            }
         }
+        carsDao.commit();
         initialize(route);
     }
 
     public void doneSwitchList() {
-/*        SwitchList switchList = switchListDao.find(route.getSwitchListId());
+        SwitchList switchList = switchListDao.findById(route.getSwitchListId());
         if (switchList != null) {
             switchList.setStatus("DONE");
             switchListDao.addOrUpdate(switchList);
             route.setSwitchListId(0);
             routesDao.addOrUpdate(route);
             for (Move m : switchList.getMoves()) {
-                if (m.getMoveType() == Move.MoveType.mtSetOut) {
-                    carsDao.moveCarTo(m.getCarId(), m.getLocationId(), true);
+                if (m.getActionType() == Move.ActionType.atSetOut) {
+                    Car car = carsDao.findById(m.getCarId());
+                    if (car != null) {
+                        Waybill waybill = waybillDao.findById(car.getWaybillId());
+                        if (waybill != null) {
+                            car.setWaybillSequence((car.getWaybillSequence() + 1) % waybill.getStops().size());
+                            car.setSwitching(false);
+                            car.setLocationId(m.getLocationId());
+                            carsDao.addOrUpdate(car, false);
+                        }
+                    }
                 }
             }
+            carsDao.commit();
             initialize(route);
-        }*/
+        }
     }
 
     public List<Move> buildListOfMoves(Route route) {
-/*        if (route.getStops().size() == 0) return new ArrayList<>();
+        if (route.getLocations().size() == 0) return new ArrayList<>();
 
         List<Move> moves = new ArrayList<>();
 
         // First move - pick up train
         {
             Move move = new Move();
-            move.setRouteName(route.getName());
-            move.setLocationId(route.getStops().get(0).getId());
-            move.setMove(Move.MoveType.mtPickupLocomotive);
+            move.setLocationId(route.getLocations().get(0).getId());
+            move.setAction(Move.ActionType.atPickupLocomotive);
             moves.add(move);
         }
 
         List<Car> carsInTrain = new ArrayList<>();
-        for (int i = 0; i < route.getStops().size(); i++) {
+        for (int i = 0; i < route.getLocations().size(); i++) {
             List<Car> carsToPickup = carsToPickup(route, i);
-            List<Car> carsToSetout = carsToSetout(carsInTrain, route.getStops().get(i));
-*/
+            List<Car> carsToSetout = carsToSetout(carsInTrain, route.getLocations().get(i));
+
 // Re-enable to debug
 /*
             System.out.println("----Stop: " + route.getStops().get(i).getName());
@@ -196,26 +216,24 @@ public class SwitchListDialogController {
                 System.out.println("  Car to pick up: " + c.getId());
             }
 */
-/*
+
             for (Car carToSetout : carsToSetout) {
                 int index = carsInTrain.indexOf(carToSetout);
                 if (i > -1) {
                     carsInTrain.remove(index);
                     Move move = new Move();
-                    move.setRouteName(route.getName());
-                    move.setLocationId(route.getStops().get(i).getId());
-                    move.setCarId(carToSetout.getRoadId());
-                    move.setMove(Move.MoveType.mtSetOut);
+                    move.setLocationId(route.getLocations().get(i).getId());
+                    move.setCarId(carToSetout.getId());
+                    move.setAction(Move.ActionType.atSetOut);
                     moves.add(move);
                 }
             }
 
             for (Car c : carsToPickup) {
                 Move move = new Move();
-                move.setRouteName(route.getName());
-                move.setLocationId(route.getStops().get(i).getId());
-                move.setCarId(c.getRoadId());
-                move.setMove(Move.MoveType.mtPickUp);
+                move.setLocationId(route.getLocations().get(i).getId());
+                move.setCarId(c.getId());
+                move.setAction(Move.ActionType.atPickUp);
                 moves.add(move);
             }
             carsInTrain.addAll(carsToPickup);
@@ -230,16 +248,13 @@ public class SwitchListDialogController {
         // First move - pick up train
         {
             Move move = new Move();
-            move.setRouteName(route.getName());
-            move.setLocationId(route.getStops().get(route.getStops().size() - 1).getId());
-            move.setMove(Move.MoveType.mtDropoffLocmotive);
+            move.setLocationId(route.getLocations().get(route.getLocations().size() - 1).getId());
+            move.setAction(Move.ActionType.atDropoffLocmotive);
             moves.add(move);
         }
 
 
-        return moves;*/
-
-        return null;
+        return moves;
     }
 
     protected int getNextWaybillSequence(Car car, Waybill waybill) {
@@ -256,34 +271,34 @@ public class SwitchListDialogController {
         List<Car> result = new ArrayList<>();
 
         for (Car c : train) {
-/*            Waybill waybill = waybillDao.findWaybill(c.getRoadId());
+            Waybill waybill = waybillDao.findByRoadId(c.getRoadId());
             int nextWaybillSequence = getNextWaybillSequence(c, waybill);
             WaybillStop stop = waybill.getStops().get(nextWaybillSequence);
 
             if (l.getId() == stop.getLocation().getId()) {
                 result.add(c);
-            }*/
+            }
         }
 
         return result;
     }
 
     protected List<Car> carsToPickup(Route route, int locationIndex) {
-/*        List<Car> result = new ArrayList<>();
+        List<Car> result = new ArrayList<>();
 
-        Location l = route.getStops().get(locationIndex);
-        List<Car> cars = carsDao.carsAtLocation(l);
+        Location l = route.getLocations().get(locationIndex);
+        List<Car> cars = carsDao.loadCarsAtLocation(l);
 
         for (Car c : cars) {
             if (c.isSwitching()) continue;
 
-            Waybill waybill = waybillDao.findWaybill(c.getRoadId());
+            Waybill waybill = waybillDao.findByRoadId(c.getRoadId());
             int nextWaybillSequence = getNextWaybillSequence(c, waybill);
             WaybillStop stop = waybill.getStops().get(nextWaybillSequence);
 
-            if (stop != null && stop.getRouting() != null && stop.getRouting().equalsIgnoreCase(route.getRailroad())) {
-                for (int i = locationIndex + 1; i < route.getStops().size(); i++) {
-                    Location next = route.getStops().get(i);
+            if (stop != null && stop.getRouting() != null && stop.getRouting().equalsIgnoreCase(route.getRailroad().getMark())) {
+                for (int i = locationIndex + 1; i < route.getLocations().size(); i++) {
+                    Location next = route.getLocations().get(i);
                     if (stop.getLocation().getId() == next.getId()) {
                         result.add(c);
                         break;
@@ -292,9 +307,12 @@ public class SwitchListDialogController {
             }
         }
 
-        return result;*/
+        return result;
+    }
 
-        return null;
+    public void viewReport() {
+        ReportGenerator reportGenerator = new ReportGenerator(route, moves);
+        ReportGenerator.showReport(new File("switch_list.pdf"), reportGenerator::reportSwitchList);
     }
 
     public void initialize(Route route) {
@@ -311,10 +329,11 @@ public class SwitchListDialogController {
         if (moves == null && route.getSwitchListId() <= 0) {
             moves = buildListOfMoves(route);
         } else if (moves == null) {
-//            SwitchList switchList = switchListDao.find(route.getSwitchListId());
-//            moves = switchList.getMoves();
+            SwitchList switchList = switchListDao.findById(route.getSwitchListId());
+            moves = switchList.getMoves();
         }
 
+        tableStops.getItems().clear();
         int lastLocId = -1;
         for (Move m : moves) {
             Location l = locationsDao.findById(m.getLocationId());
@@ -325,8 +344,8 @@ public class SwitchListDialogController {
                 tableStops.getItems().add(tableItem);
             }
 
-            if (m.getMoveType() == Move.MoveType.mtPickUp || m.getMoveType() == Move.MoveType.mtSetOut) {
-                Car c = carsDao.find(String.format("car_id = '%s'", m.getCarId())).get(0);
+            if (m.getActionType() == Move.ActionType.atPickUp || m.getActionType() == Move.ActionType.atSetOut) {
+                Car c = carsDao.find(String.format("id = %s", m.getCarId())).get(0);
                 if (l != null && c != null) {
                     TableItem tableItem = new TableItem(m, c, null);
                     tableStops.getItems().add(tableItem);

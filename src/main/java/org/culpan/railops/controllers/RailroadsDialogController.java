@@ -8,7 +8,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import org.culpan.railops.dao.RailroadsDao;
 import org.culpan.railops.model.Railroad;
@@ -29,6 +28,9 @@ public class RailroadsDialogController implements Initializable {
     @FXML
     private TextField textName;
 
+    @FXML
+    private TextField textShortName;
+
     private final ObservableList<Railroad> data = FXCollections.observableArrayList();
 
     public void itemSelected() {
@@ -38,13 +40,16 @@ public class RailroadsDialogController implements Initializable {
             if (r != null) {
                 textMark.setText(r.getMark());
                 textName.setText(r.getName());
+                textShortName.setText(r.getShortName());
             } else {
                 textMark.setText("");
                 textName.setText("");
+                textShortName.setText("");
             }
         } else {
             textMark.setText("");
             textName.setText("");
+            textShortName.setText("");
         }
     }
 
@@ -56,7 +61,10 @@ public class RailroadsDialogController implements Initializable {
 
     public void addRailroad(ActionEvent event) {
         if (textMark.getText() != null && !textMark.getText().isEmpty()) {
-            Railroad r = new Railroad(textMark.getText().trim(), textName.getText());
+            Railroad r = new Railroad();
+            r.setMark(textMark.getText());
+            r.setName(textName.getText());
+            r.setShortName(textShortName.getText());
             railroadsDao.addOrUpdate(r);
 
             initialize(null, null);
@@ -82,5 +90,6 @@ public class RailroadsDialogController implements Initializable {
         tableRailroads.refresh();
         textMark.setText("");
         textName.setText("");
+        textShortName.setText("");
     }
 }

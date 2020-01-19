@@ -46,6 +46,11 @@
             <MenuItem mnemonicParsing="false" text="Unselect All" />
           </items>
         </Menu>
+            <Menu mnemonicParsing="false" text="Reports">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#reportFreightCars" text="Freight Cars" />
+              </items>
+            </Menu>
         <Menu mnemonicParsing="false" text="Help">
           <items>
             <MenuItem mnemonicParsing="false" text="About MyHelloApp" />
@@ -58,7 +63,7 @@
             <TreeView fx:id="treeRoutes" layoutX="14.0" layoutY="32.0" prefHeight="327.0" prefWidth="462.0" />
             <VBox alignment="TOP_CENTER" layoutX="490.0" layoutY="32.0" prefHeight="327.0" prefWidth="105.0" spacing="10.0">
                <children>
-                  <Button fx:id="btnClick" mnemonicParsing="false" onAction="#btnClickClick" prefWidth="84.5" text="Railroads" />
+                  <Button fx:id="btnClick" mnemonicParsing="false" onAction="#btnRailroads" prefWidth="84.5" text="Railroads" />
                   <Button mnemonicParsing="false" onAction="#freightCarsClicked" text="Freight Cars" />
                   <Button mnemonicParsing="false" onAction="#locationsClicked" prefWidth="84.5" text="Locations" />
                </children>

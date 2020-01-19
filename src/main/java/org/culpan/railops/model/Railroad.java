@@ -11,12 +11,10 @@ public class Railroad extends BaseModel {
     @Column
     private String name;
 
-    public Railroad() {}
+    @Column(name = "short_name")
+    private String shortName;
 
-    public Railroad(String reportingMark, String name) {
-        setMark(reportingMark);
-        setName(name);
-    }
+    public Railroad() {}
 
     public String getMark() {
         return mark;
@@ -32,5 +30,18 @@ public class Railroad extends BaseModel {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
+    }
+
+    public String getDisplayName() {
+        if (shortName == null || shortName.isBlank()) return name;
+        return shortName;
     }
 }
